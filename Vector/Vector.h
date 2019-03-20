@@ -129,11 +129,11 @@ void Vector<T>::Remove(const int& index)
 template <typename T>
 int Vector<T>::Find(const T& value)
 {
-	for (int i = 0; i < size; i++)
+	for (T* itr = Begin(); itr < End(); itr++)
 	{
-		if (data[i] == value)
+		if (*itr == value)
 		{
-			return i;
+			return (itr - Begin());
 		}
 	}
 	return -1;
