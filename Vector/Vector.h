@@ -136,6 +136,7 @@ int Vector<T>::Find(const T& value)
 			return i;
 		}
 	}
+	return -1;
 }
 
 template <typename T>
