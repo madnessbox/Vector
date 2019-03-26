@@ -9,43 +9,39 @@ public:
 	Vector(const Vector& vector);
 	~Vector();
 
-	T* data;
-
 	void PushBack(const T& value);
-	void Insert(const T& value, const int& index);
-	void Remove(const int& index);
+	void Insert(const T& value, int index);
+	void Remove(int index);
 	void Clear();
+	void Add(const T& value);
+
+	void Sort();
+	void Search();
 
 	int Find(const T& value);
 	int Size() { return size; };
 
-	typedef T* iterator;
-	iterator Begin() { return data; }
-	iterator End() { return &data[size]; }
-
-	iterator Iterator() { return Begin();  }
+	T* begin() { return data; }
+	T* end() { return data + size; }
+	T* Iterator() { return begin();  }
 
 	T& operator [] (int index)
 	{
-		if (index >= size || index < 0)
-		{
-			throw std::out_of_range("Index is Out of Range!");
-		}
+		assert(index < size && index >= 0 && "Index was out of range");
 
 		return data[index];
 	}
 
-	T operator [] (int index) const
+	const T& operator [] (int index) const
 	{
-		if (index >= size || index < 0)
-		{
-			throw std::out_of_range("Index is Out of Range!");
-		}
+		assert(index < size && index >= 0 && "Index was out of range");
 
 		return data[index];
 	}
 
 private:
+	T* data;
+
 	int size = 0;
 	int capacity = 1;
 
@@ -54,15 +50,14 @@ private:
 
 template <typename T>
 Vector<T>::Vector()
-{
-	data = new T[capacity];
-}
+	: data(new T[capacity])
+{}
 
 template <typename T>
 Vector<T>::Vector(const Vector& vector)
+	: data(new T[vector.Size()])
 {
-	data = new T[vector.Size()];
-	for (T* itr = vector.Begin(); itr < vector.End(); itr++)
+	for (T* itr = vector.begin(); itr < vector.end(); itr++)
 	{
 		this.Pushback(itr);
 	}
@@ -84,44 +79,32 @@ void Vector<T>::PushBack(const T& value)
 		IncreaseCapacity();
 	}
 
-	*End() = value;
+	*end() = value;
 	size++;
 }
 
 template <typename T>
-void Vector<T>::Insert(const T& value, const int& index)
+void Vector<T>::Insert(const T& value, int index)
 {
-	if (index >= size || index < 0)
-	{
-		throw std::out_of_range("Index is Out of Range!");
-	}
+	assert(index < size && index >= 0 && "Index was out of range");
 
-	if (size + 1 >= capacity)
+	if (size >= capacity)
 	{
 		IncreaseCapacity();
 	}
 
-	for (T* itr = End() + 1; itr > Begin() + index; itr--)
-	{
-		*itr = *(itr - 1);
-	}
-
+	*end() = data[index];
 	data[index] = value;
+
 	size++;
 }
 
 template <typename T>
-void Vector<T>::Remove(const int& index)
+void Vector<T>::Remove(int index)
 {
-	if (index >= size || index < 0)
-	{
-		throw std::out_of_range("Index is Out of Range!");
-	}
+	assert(index < size && index >= 0 && "Index was out of range");
 
-	for (T* itr = Begin() + index; itr < End(); itr++)
-	{
-		*itr = *(itr + 1);
-	}
+	index = *(end() - 1);
 	
 	size--;
 }
@@ -146,19 +129,39 @@ void Vector<T>::Clear()
 }
 
 template <typename T>
+void Vector<T>::Add(const T& value)
+{
+	if (size >= capacity)
+	{
+		IncreaseCapacity();
+	}
+
+	*end() = *begin();
+	*begin = value;
+	size++;
+}
+
+template <typename T>
 void Vector<T>::IncreaseCapacity()
 {
 	capacity *= 2;
 
 	T* newArray = new T[capacity];
 
-	int i = 0;
-	for (T* itr = Begin(); itr < End(); itr++)
+	try
 	{
-		newArray[i] = *itr;
-		i++;
+		int i = 0;
+		for (T* itr = begin(); itr < end(); itr++)
+		{
+			newArray[i] = *itr;
+			i++;
+		}
 	}
-
+	catch (const std::exception& e)
+	{
+		std::cout << "exception thrown with message: " << e.what() << std::endl;
+	}
+	
 	delete[] data;
 	data = newArray;
 }
