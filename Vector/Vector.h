@@ -14,14 +14,17 @@ public:
 	void pushBack(const T& value);
 	void insert(const T& value, int index);
 	void remove(int index);
-	void swapToRemove(int index);
+	void removeBySwap(int index);
 	void clear();
+	void addBySwap(const T& value);
 	void add(const T& value);
+	void swap(int index1, int index2);
+
 
 	void sort();
-	void search();
+	int search(const T& value);
 
-	 int find(const T& value);
+	int linearSearch(const T& value);
 	int size() { return _size; };
 	int capacity() { return _capacity; };
 
@@ -99,7 +102,7 @@ void Vector<T>::insert(const T& value, int index)
 	for (int i = _size; i > index; i--)
 	{
 		_data[i] = _data[i - 1];
- 	}
+	}
 	_data[index] = value;
 
 	_size++;
@@ -110,20 +113,16 @@ void Vector<T>::remove(int index)
 {
 	assert(index < _size && index >= 0 && "Index is out of range");
 
-	// Todo: föredrar att du inte använder end() utan data, samma som ovan, borde kalla swapToRemove
-
-	//index = *(end() - 1);
-
 	for (int i = index; i < _size - 1; i++)
 	{
 		_data[i] = _data[i + 1];
 	}
-	
+
 	_size--;
 }
 
 template <typename T>
-void Vector<T>::swapToRemove(int index)
+void Vector<T>::removeBySwap(int index)
 {
 	assert(index < _size && index >= 0 && "Index is out of range");
 
@@ -131,7 +130,7 @@ void Vector<T>::swapToRemove(int index)
 }
 
 template <typename T>
-int Vector<T>::find(const T& value)
+int Vector<T>::linearSearch(const T& value)
 {
 	for (int i = 0; i < _size; i++)
 	{
@@ -151,6 +150,19 @@ void Vector<T>::clear()
 }
 
 template <typename T>
+void Vector<T>::addBySwap(const T& value)
+{
+	if (_size >= _capacity)
+	{
+		increaseCapacity();
+	}
+
+	_data[size - 1] = _data[0];
+	_data[0] = value;
+	_size++;
+}
+
+template <typename T>
 void Vector<T>::add(const T& value)
 {
 	if (_size >= _capacity)
@@ -158,9 +170,83 @@ void Vector<T>::add(const T& value)
 		increaseCapacity();
 	}
 
-	*end() = *begin();
-	*begin = value;
+	for (int i = _size; i > 0; i--)
+	{
+		_data[i] = _data[i - 1];
+	}
+
+	_data[0] = value;
+
 	_size++;
+}
+
+template <typename T>
+void Vector<T>::swap(int index1, int index2)
+{
+	assert(index1 < _size && index1 >= 0 && "Index1 is out of range");
+	assert(index2 < _size && index2 >= 0 && "Index2 is out of range");
+
+	try
+	{
+		T temp = _data[index1];
+		_data[index1] = _data[index2];
+		_data[index2] = temp;
+	}
+	catch (const std::exception& e)
+	{
+		std::cout << "Exception thrown with message: " << e.what() << std::endl;
+	}
+}
+
+template <typename T>
+void Vector<T>::sort()
+{
+	bool swapped = false;
+
+	for (int i = 0; i < _size - 1; i++)
+	{
+		swapped = false;
+		for (int j = 0; j < _size - i - 1; j++)
+		{
+			if (_data[j] > _data[j + 1])
+			{
+				swap(j, j + 1);
+				swapped = true;
+			}
+		}
+
+		if (!swapped)
+			break;
+	}
+}
+
+template <typename T>
+int Vector<T>::search(const T& value)
+{
+	sort();
+	
+	int low = 0;
+	int high = _size - 1;
+	int mid = 0;
+
+	if (low == high)
+		return 0;
+
+	while (low < high)
+	{
+		mid = (low + high) / 2;
+
+		if (_data[mid] == value)
+			return mid;
+
+		if (_data[mid] < value)
+			low = mid + 1;
+
+		if (_data[mid] > value)
+			high = mid - 1;
+	}
+
+	return -1;
 }
 
 template <typename T>
@@ -181,7 +267,7 @@ void Vector<T>::increaseCapacity()
 	{
 		std::cout << "Exception thrown with message: " << e.what() << std::endl;
 	}
-	
+
 	delete[] _data;
 	_data = newArray;
 }

@@ -12,14 +12,8 @@ int main()
 	myVec.pushBack(9);
 	myVec.pushBack(1);
 
-	myVec.insert(7, 2);
-	myVec.insert(15, 0);
 
-	myVec.remove(0);
-
-	std::cout << myVec[3] << std::endl;
-
-	std::cout << myVec.find(6) << std::endl;
+	std::cout << myVec.search(4) << std::endl;
 
 	return 0;
 }
