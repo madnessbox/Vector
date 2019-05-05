@@ -232,7 +232,7 @@ int Vector<T>::search(const T& value)
 	if (low == high)
 		return 0;
 
-	while (low < high)
+	while (low <= high)
 	{
 		mid = (low + high) / 2;
 
